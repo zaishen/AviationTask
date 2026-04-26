@@ -1,0 +1,57 @@
+aviation:
+  api:
+    base-url: https://api-v2.aviationapi.com/v2
+    connect-timeout-ms: 3000
+    read-timeout-ms: 5000
+    max-retries: 3
+    retry-initial-interval-ms: 500
+    retry-multiplier: 2.0
+    cb-sliding-window-size: 10
+    cb-failure-rate-threshold: 50
+    cb-wait-duration-in-open-state-ms: 30000
+    cb-permitted-calls-in-half-open-state: 1
+    rate-limit-for-period: 10
+    rate-limit-refresh-period-ms: 1000
+    rate-limit-timeout-ms: 0
+    cache-expire-after-write-minutes: 60
+    cache-maximum-size: 1000
+    pool-max-total: 50
+    pool-max-per-route: 20
+
+resilience4j:
+  circuitbreaker:
+    instances:
+      upstreamApi:
+        sliding-window-size: ${aviation.api.cb-sliding-window-size}
+        failure-rate-threshold: ${aviation.api.cb-failure-rate-threshold}
+        wait-duration-in-open-state: ${aviation.api.cb-wait-duration-in-open-state-ms}ms
+        permitted-number-of-calls-in-half-open-state: ${aviation.api.cb-permitted-calls-in-half-open-state}
+        sliding-window-type: COUNT_BASED
+  retry:
+    instances:
+      upstreamApi:
+        max-attempts: ${aviation.api.max-retries}
+        wait-duration: ${aviation.api.retry-initial-interval-ms}ms
+        enable-exponential-backoff: true
+        exponential-backoff-multiplier: ${aviation.api.retry-multiplier}
+        retry-exceptions:
+          - com.example.aviation.exception.UpstreamServiceException
+          - java.net.SocketTimeoutException
+          - java.net.ConnectException
+  ratelimiter:
+    instances:
+      upstreamApi:
+        limit-for-period: ${aviation.api.rate-limit-for-period}
+        limit-refresh-period: ${aviation.api.rate-limit-refresh-period-ms}ms
+        timeout-duration: ${aviation.api.rate-limit-timeout-ms}ms
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, metrics
+  endpoint:
+    health:
+      probes:
+        enabled: true
+      show-details: when-authorized
