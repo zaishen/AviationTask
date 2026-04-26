@@ -157,9 +157,9 @@ The `message` field never exposes stack traces, class names, or internal details
 The exception hierarchy (`AviationBaseException` → specific subtypes) is handled by a single `@RestControllerAdvice` class with dedicated `@ExceptionHandler` methods for each type.
 
 
-## AI-Generated Code
+## AI-Generated Code Detail
 
-All code in this project was generated with AI assistance using [Kiro](https://kiro.dev). Below are the implementation details not covered in the Architecture section.
+This task was generated with AI assistance using [Kiro](https://kiro.dev). Below are the implementation details.
 
 ### Upstream Response Mapping
 
